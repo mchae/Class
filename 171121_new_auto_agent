@@ -1,0 +1,74 @@
+# sketch.py
+from vehicle import Vehicle
+
+def setup():
+    global v
+    size(640, 360)
+    v = Vehicle(width/2, height/2)
+    
+def draw(): 
+    background(255)
+    
+    mouse = PVector(mouseX, mouseY)
+    
+    fill(255, 0, 0)
+    rect(mouse.x, mouse.y, 20, 20)
+    
+    v.seek(mouse)
+    v.update()
+    v.display()
+    
+# vehicle.py
+class Vehicle():
+    def __init__(self, x, y):
+        self.pos = PVector(x, y)
+        self.vel = PVector(0, -2)
+        self.acc = PVector(0, 0)
+        
+        self.maxspeed = 4
+        self.maxforce = 0.05
+        self.r = 6
+        
+    def update(self):
+        self.vel.add(self.acc)
+        self.vel.limit(self.maxspeed)
+        
+        self.pos.add(self.vel)
+        
+        self.acc.mult(0)
+        
+        
+    def applyForce(self, force):
+        self.acc.add(force)
+        
+    def seek(self, target):
+        desired = PVector.sub(target, self.pos)
+        desired.setMag(self.maxspeed)
+        
+        
+        steer = PVector.sub(desired, self.vel)
+        steer.limit(self.maxforce)
+        
+        
+        self.applyForce(steer)
+              
+        
+    def display(self):
+        fill(127)
+        
+        theta = self.vel.heading() + PI/2
+        
+        
+        stroke(0)
+        strokeWeight(1)
+        
+        pushMatrix()
+        translate(self.pos.x, self.pos.y)
+        rotate(theta)
+        beginShape()
+        vertex(0, -self.r*2)
+        vertex(-self.r, self.r*2)
+        vertex(self.r, self.r*2)
+        endShape()
+        popMatrix()   
+    
