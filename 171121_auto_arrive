@@ -1,0 +1,120 @@
+# sketch.py
+from vehicle import Vehicle
+from target import Target
+
+vehicles = []
+num = 100
+
+def setup():
+    global v, t, debug
+    #size(640, 360)
+    fullScreen()
+    t = Target(random(width), random(height))
+    for i in range(num):
+        vehicles.append(Vehicle(random(width), random(height)))
+        
+    debug = False
+    
+def draw(): 
+    background(255)
+    
+    if (debug == False):
+        t.update()
+        
+    t.display()
+    
+    for i in range(num):
+        vehicles[i].seek(t.pos)
+        vehicles[i].update()
+        vehicles[i].display()
+        
+        
+def mousePressed():
+    global debug
+    debug = not debug
+    
+    
+# target.py
+class Target():
+    
+    def __init__(self, x, y):
+        self.pos = PVector(x, y)
+        self.speed = PVector(3,3)
+        
+    def update(self):
+        #self.pos.x = self.pos.x + self.speed.x
+        #self.pos.y = self.pos.y + self.speed.y
+        self.pos.add(self.speed)
+        
+        if (self.pos.x > width or self.pos.x < 0):
+            self.speed.x = -1 * self.speed.x
+        if (self.pos.y > height or self.pos.y < 0):
+            self.speed.y = -1 * self.speed.y
+
+        
+    def display(self):
+        fill(255, 0, 0)
+        rect(self.pos.x, self.pos.y, 20, 20)
+ 
+ 
+ # vehicle.py
+ class Vehicle():
+    def __init__(self, x, y):
+        self.pos = PVector(x, y)
+        self.vel = PVector(0, -2)
+        self.acc = PVector(0, 0)
+        
+        self.maxspeed = 4
+        self.maxforce = random(0.01, 0.1)
+        self.r = 6
+        
+    def update(self):
+        self.vel.add(self.acc)
+        self.vel.limit(self.maxspeed)
+        
+        self.pos.add(self.vel)
+        
+        self.acc.mult(0)
+        
+        
+    def applyForce(self, force):
+        self.acc.add(force)
+        
+    def seek(self, target):
+        desired = PVector.sub(target, self.pos)
+        #desired.setMag(self.maxspeed)
+        
+        m = desired.mag()
+        if (m < 100):
+            desired.setMag(map(m, 0, 100, 0, self.maxspeed))
+        else:
+            desired.setMag(self.maxspeed)
+        
+        
+        steer = PVector.sub(desired, self.vel)
+        steer.limit(self.maxforce)
+        
+        
+        self.applyForce(steer)
+              
+        
+    def display(self):
+        fill(127)
+        
+        theta = self.vel.heading() + PI/2
+        
+        
+        stroke(0)
+        strokeWeight(1)
+        
+        pushMatrix()
+        translate(self.pos.x, self.pos.y)
+        rotate(theta)
+        beginShape()
+        vertex(0, -self.r*2)
+        vertex(-self.r, self.r*2)
+        vertex(self.r, self.r*2)
+        endShape()
+        popMatrix()
+        
+        text(self.maxforce, self.pos.x, self.pos.y)   
