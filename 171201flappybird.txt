@@ -1,0 +1,108 @@
+# sketch.py
+from bird import Bird
+from pipe import Pipe
+
+pipes = []
+def setup():
+    global bird
+    size(800, 600)
+    bird = Bird()
+    pipes.append(Pipe())
+    
+
+def draw():
+    background(0)
+    
+    for i in range(len(pipes) - 1, -1, -1):
+        pipes[i].show()
+        pipes[i].update()
+    
+        if (pipes[i].hits(bird)):
+            print("HIT")
+        
+    
+        if (pipes[i].offscreen()):
+            del[i]
+        
+    bird.update()
+    bird.show()
+    
+    if (frameCount % 100 == 0):
+        pipes.append(Pipe())
+    
+def keyPressed():
+    if (key == ' '):
+        bird.up()
+        #print("SPACE")
+  
+# bird.py
+class Bird():
+    def __init__(self):
+        self.y = height/2
+        self.x = 64
+        
+        self.gravity = 0.6
+        self.lift = -15
+        self.velocity = 0
+
+    def show(self):
+        fill(255)
+        ellipse(self.x, self.y, 32, 32)
+    
+    
+    def up(self):
+        self.velocity += self.lift
+    
+    
+    def update(self):
+        self.velocity += self.gravity
+        self.velocity *= 0.9
+        self.y += self.velocity
+    
+        if (self.y > height):
+            self.y = height
+            self.velocity = 0
+        
+        if (self.y < 0):
+            self.y = 0
+            self.velocity = 0
+            
+# pipe.py
+class Pipe():
+
+    def __init__(self):    
+        self.top = random(height/2)
+        self.bottom = random(height/2)
+        self.x = width
+        self.w = 20
+        self.speed = 2
+        
+        self.highlight = False
+
+    def hits(self, bird):
+        if (bird.y < self.top or bird.y > height - self.bottom):
+            if (bird.x > self.x and bird.x < self.x + self.w):
+                self.highlight = True
+                return True
+        self.highlight = False
+        return False
+
+
+    def show(self):
+        fill(255)
+        if (self.highlight):
+            fill(255, 0, 0)
+        
+        rect(self.x, 0, self.w, self.top)
+        rect(self.x, height-self.bottom, self.w, self.bottom)
+    
+
+    def update(self):
+        self.x -= self.speed
+
+
+    def offscreen(self):
+        if (self.x < -self.w):
+            return True
+        else:
+            return False
