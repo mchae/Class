@@ -1,0 +1,232 @@
+# Vehicle.py
+# Path Following
+# Daniel Shiffman <http://www.shiffman.net>
+# The Nature of Code, Spring 2009
+
+# Vehicle class
+
+
+class Vehicle():
+
+  # All the usual stuff
+
+    # Constructor initialize all values
+    def __init__(self, l, ms, mf):
+        self.position = l.get()
+        self.r = 4.0
+        self.maxspeed = ms
+        self.maxforce = mf
+        self.acceleration = PVector(0, 0)
+        self.velocity = PVector(self.maxspeed, 0)
+    
+
+  # Main "run" function
+    def run(self):
+        self.update()
+        self.display()
+    
+
+
+  # This function implements Craig Reynolds' path following algorithm
+  # http://www.red3d.com/cwr/steer/PathFollow.html
+    def follow(self, p, debug):
+        print(debug)
+    
+        # Predict self.position 50 (arbitrary choice) frames ahead
+        predict = self.velocity.get()
+        predict.normalize()
+        predict.mult(50)
+        predictpos = PVector.add(self.position, predict)
+    
+        # Look at the line segment
+        a = p.start
+        b = p.end
+    
+        # Get the normal point to that line
+        normalPoint = self.getNormalPoint(predictpos, a, b)
+    
+        # Find target point a little further ahead of normal
+        dir = PVector.sub(b, a)
+        dir.normalize()
+        dir.mult(10)  # This could be based on self.velocity instead of just an arbitrary 10 pixels
+        target = PVector.add(normalPoint, dir)
+    
+        # How far away are we from the path?
+        distance = PVector.dist(predictpos, normalPoint)
+        # Only if the distance is greater than the path's radius do we bother to steer
+        if (distance > p.radius):
+            self.seek(target)
+        
+    
+    
+        # Draw the debugging stuff
+        if (debug):
+            fill(0)
+            stroke(0)
+            line(self.position.x, self.position.y, predictpos.x, predictpos.y)
+            ellipse(predictpos.x, predictpos.y, 4, 4)
+        
+            # Draw normal self.position
+            fill(0)
+            stroke(0)
+            line(predictpos.x, predictpos.y, normalPoint.x, normalPoint.y)
+            ellipse(normalPoint.x, normalPoint.y, 4, 4)
+            stroke(0)
+            if (distance > p.radius):
+                fill(255, 0, 0)
+            noStroke()
+            ellipse(target.x+dir.x, target.y+dir.y, 8, 8)
+            
+    
+
+
+  # A function to get the normal point from a point (p) to a line segment (a-b)
+  # This function could be optimized to make fewer new Vector objects
+    def getNormalPoint(self, p, a, b):
+        # Vector from a to p
+        ap = PVector.sub(p, a)
+        # Vector from a to b
+        ab = PVector.sub(b, a)
+        ab.normalize() # Normalize the line
+        # Project vector "diff" onto line by using the dot product
+        ab.mult(ap.dot(ab))
+        normalPoint = PVector.add(a, ab)
+        return normalPoint
+    
+
+
+  # Method to update self.position
+    def update(self):
+        # Update self.velocity
+        self.velocity.add(self.acceleration)
+        # Limit speed
+        self.velocity.limit(self.maxspeed)
+        self.position.add(self.velocity)
+        # Reset accelertion to 0 each cycle
+        self.acceleration.mult(0)
+    
+
+    def applyForce(self, force):
+        # We could add mass here if we want A = F / M
+        self.acceleration.add(force)
+    
+
+
+  # A method that calculates and applies a steering force towards a target
+  # STEER = DESIRED MINUS self.velocity
+    def seek(self, target):
+        desired = PVector.sub(target, self.position)  # A vector pointing from the self.position to the target
+    
+        # If the magnitude of desired equals 0, skip out of here
+        # (We could optimize this to check if x and y are 0 to adef mag() square root
+        if (desired.mag() == 0):
+            return
+    
+        # Normalize desired and scale to maximum speed
+        desired.normalize()
+        desired.mult(self.maxspeed)
+        # Steering = Desired minus self.velocity
+        steer = PVector.sub(desired, self.velocity)
+        steer.limit(self.maxforce)  # Limit to maximum steering force
+    
+        self.applyForce(steer)
+    
+
+    def display(self):
+        # Draw a triangle rotated in the direction of self.velocity
+        theta = self.velocity.heading2D() + radians(90)
+        fill(175)
+        stroke(0)
+        pushMatrix()
+        translate(self.position.x, self.position.y)
+        rotate(theta)
+        beginShape(PConstants.TRIANGLES)
+        vertex(0, -self.r*2)
+        vertex(-self.r, self.r*2)
+        vertex(self.r, self.r*2)
+        endShape()
+        popMatrix()
+    
+
+  # Wraparound
+    def borders(self, p):
+        if (self.position.x > p.end.x + self.r):
+            self.position.x = p.start.x - self.r
+            self.position.y = p.start.y + (self.position.y-p.end.y)
+            
+  
+  # Path.py
+  # The Nature of Code
+# Daniel Shiffman
+# http://natureofcode.com
+
+# Path Following
+
+class Path():
+
+
+    def __init__(self):
+        # Arbitrary self.radius of 20
+        self.radius = 20
+        self.start = PVector(0,height/3)
+        self.end = PVector(width,2*height/3)
+
+
+  # Draw the path
+    def display(self):
+        strokeWeight(self.radius*2)
+        stroke(0,100)
+        line(self.start.x,self.start.y,self.end.x,self.end.y)
+    
+        strokeWeight(1)
+        stroke(0)
+        line(self.start.x,self.start.y,self.end.x,self.end.y)
+    
+
+# sketch.py
+from path import Path
+from vehicle import Vehicle
+
+
+def setup():
+    global path, car1, car2, debug
+    size(640, 360)
+    path = Path()
+    debug = False
+    
+    # Each vehicle has different maxspeed and maxforce for demo purposes
+    car1 = Vehicle(PVector(0, height/2), 2, 0.02)
+    car2 = Vehicle(PVector(0, height/2), 3, 0.05)
+    
+
+def draw():
+    background(255)
+    # Display the path
+    path.display()
+    # The boids follow the path
+    car1.follow(path, debug)
+    car2.follow(path, debug)
+    # Call the generic run method (update, borders, display, etc.)
+    car1.run()
+    car2.run()
+    
+    # Check if it gets to the end of the path since it's not a loop
+    car1.borders(path)
+    car2.borders(path)
+    
+    # Instructions
+    fill(0)
+    text("Hit space bar to toggle debugging lines.", 10, height-30)
+    
+
+def keyPressed():
+    global debug
+    if (key == ' '):
+        debug = not debug
+    
+
+
+
+
+
+    
