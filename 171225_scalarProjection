@@ -1,0 +1,38 @@
+def setup():
+  size(600, 360)
+
+
+def draw():
+    background(255)
+    
+    a = PVector(20,300)
+    b = PVector(500,250)
+    mouse = PVector(mouseX,mouseY)
+    
+    stroke(0)
+    strokeWeight(2)
+    line(a.x,a.y,b.x,b.y)
+    line(a.x,a.y,mouse.x,mouse.y)
+    fill(0)
+    ellipse(a.x,a.y,8,8)
+    ellipse(b.x,b.y,8,8)
+    ellipse(mouse.x,mouse.y,8,8)
+    
+    norm = scalarProjection(mouse,a,b)
+    strokeWeight(1)
+    stroke(50)
+    line(mouse.x,mouse.y,norm.x,norm.y)
+    
+    noStroke()
+    fill(255,0,0)
+    ellipse(norm.x,norm.y,16,16)
+
+
+
+def scalarProjection(p, a, b):
+    ap = PVector.sub(p, a)
+    ab = PVector.sub(b, a)
+    ab.normalize() # Normalize the line
+    ab.mult(ap.dot(ab))
+    normalPoint = PVector.add(a, ab)
+    return normalPoint
