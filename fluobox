@@ -1,2 +1,4 @@
 - ubuntu 18.04 LTS
-- $sudo apt install apache2
+- $sudo apt install apache2         #install web server
+- $sudo apt install openssh-server  # install ssh server
+- $sudo systemctl status ssh        #check ssh server 
