@@ -2,3 +2,4 @@
 - $sudo apt install apache2         #install web server
 - $sudo apt install openssh-server  # install ssh server
 - $sudo systemctl status ssh        #check ssh server 
+- $sudo apt-get install vsftpd  # https://linuxconfig.org/how-to-setup-ftp-server-on-ubuntu-18-04-bionic-beaver-with-vsftpd
