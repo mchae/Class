@@ -7,3 +7,8 @@
 # sftp is working with ssh
 - $sudo apt-get install python3-pip
 - $sudo apt install r-base-core
+$sudo apt-get install npm nodejs
+$sudo apt-get install r-base
+$sudo apt-get install gdebi-core
+$wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.2.5001-amd64.deb
+$sudo gdebi rstudio-server-1.2.5001-amd64.deb
