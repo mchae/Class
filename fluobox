@@ -5,4 +5,5 @@
 
 # $sudo apt-get install vsftpd  # https://linuxconfig.org/how-to-setup-ftp-server-on-ubuntu-18-04-bionic-beaver-with-vsftpd, no need this
 # sftp is working with ssh
-- sudo apt-get install python3-pip
+- $sudo apt-get install python3-pip
+- $sudo apt install r-base-core
