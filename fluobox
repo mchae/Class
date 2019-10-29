@@ -12,3 +12,8 @@ $sudo apt-get install r-base
 $sudo apt-get install gdebi-core
 $wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.2.5001-amd64.deb
 $sudo gdebi rstudio-server-1.2.5001-amd64.deb
+
+$python3 -m pip install jupyterhub
+$npm install -g configurable-http-proxy
+$python3 -m pip install notebook 
+$sudo pip3 install jupyterlab
