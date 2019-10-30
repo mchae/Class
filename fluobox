@@ -22,3 +22,7 @@ $sudo pip3 install jupyterlab
 # install R kernel for jupyterhub
 install.packages('IRkernel')
 IRkernel::installspec()  # to register the kernel in the current R installation
+
+# ipycanvas (10/30/19)
+pip install ipycanvas
+jupyter labextension install @jupyter-widgets/jupyterlab-manager ipycanvas
