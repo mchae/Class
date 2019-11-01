@@ -30,3 +30,4 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager ipycanvas
 
 
 sudo apt-get install python3-tk
+https://www.katrinasiegfried.com/single-post/2018/10/24/Installing-GraphViz-on-Linux-Ubuntu-1804LTS
